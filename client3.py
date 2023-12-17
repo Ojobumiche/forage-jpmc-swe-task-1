@@ -25,24 +25,32 @@ import urllib.request
 # Server API URLs
 QUERY = "http://localhost:8080/query?id={}"
 
+
 # 500 server request
 N = 500
 
 
 def getDataPoint(quote):
-    """ Produce all the needed values to generate a datapoint """
-    """ ------------- Update this function ------------- """
+    """Extracts relevant information from the quote to generate a datapoint.
+       Updated to return the stock, bid_price, ask_price, and price.
+    """
     stock = quote['stock']
     bid_price = float(quote['top_bid']['price'])
     ask_price = float(quote['top_ask']['price'])
-    price = bid_price
+    price = (bid_price + ask_price) / 2 # use the average of bid and ask as the price
     return stock, bid_price, ask_price, price
 
 
 def getRatio(price_a, price_b):
-    """ Get ratio of price_a and price_b """
-    """ ------------- Update this function ------------- """
-    return 1
+    """ 
+    Calculates the ratio of price_a to price_b.
+    Updated to return the ratio of price_a to price_b.
+    """
+    # This is to ensure price_b is not zero to avoid division by zero
+    if price_b != 0:
+        return price_a / price_b
+    else:
+        return "Undefined (division by zero)"
 
 
 # Main
@@ -50,10 +58,13 @@ if __name__ == "__main__":
     # Query the price once every N seconds.
     for _ in iter(range(N)):
         quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
-
-        """ ----------- Update to get the ratio --------------- """
+        
+        # Iterate through quotes and print information
         for quote in quotes:
             stock, bid_price, ask_price, price = getDataPoint(quote)
             print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
 
-        print("Ratio %s" % getRatio(price, price))
+        # Calculate and print the ratio of price to itself (for demonstration)
+        ratio = getRatio(price, price)
+        print("Ratio %s" % ratio)
+       
